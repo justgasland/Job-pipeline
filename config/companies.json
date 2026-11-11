@@ -1,5 +1,5 @@
 {
-  "_comment": "Company slugs to check on each ATS. Find a slug in a company's careers URL: boards.greenhouse.io/SLUG, jobs.lever.co/SLUG, or jobs.ashbyhq.com/SLUG. Wrong slugs just log a 404 and are skipped, so delete any that 404.",
+  "_comment": "Company slugs to check on each ATS. Find a slug in a company's careers URL. Wrong slugs just log a 404 and are skipped, so delete any that 404.",
   "greenhouse": [
     "stripe",
     "gitlab",
@@ -44,7 +44,13 @@
     "clickhouse"
   ],
   "_ashby_howto": "URL: jobs.ashbyhq.com/{slug}. API: https://api.ashbyhq.com/posting-api/job-board/{slug}",
-  "bamboohr": [],
+  "bamboohr": [
+    "flutterwavego"
+  ],
   "_bamboohr_howto": "URL: {slug}.bamboohr.com/careers. API: https://{slug}.bamboohr.com/careers/list",
+  "workable": [
+    "kuda"
+  ],
+  "_workable_howto": "URL: https://apply.workable.com/{slug}/. Public jobs are read from its jobs API.",
   "notes": "Expand this whenever you find a company worth tracking."
 }

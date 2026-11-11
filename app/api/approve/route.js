@@ -2,13 +2,8 @@
 // Updates a row's Status when you click a button on the dashboard.
 // Body: { row: 5, status: "Approved" }
 //
-// Clicking Approve acts immediately:
-//   - email job (Submission Method "Email" + address in Notes): the
-//     application is sent now, status becomes "Applied (Auto)" and a
-//     follow-up is set 7 days out. If sending fails, the row stays
-//     "Approved" and the next pipeline run retries it.
-//   - any other job (web form): moves straight to "Needs Manual Apply".
-// Marking a job Applied also sets a 7-day follow-up.
+// Approval only moves a job to the manual-apply queue; nothing is sent.
+// Marking a job Applied sets a 7-day follow-up reminder.
 
 import { NextResponse } from "next/server";
 import {
@@ -17,17 +12,10 @@ import {
   setFollowUpDate,
   STATUS,
 } from "../../../lib/sheets.js";
-import { sendApplication } from "../../../lib/autoApply.js";
 
 export const maxDuration = 30;
 const ALLOWED_STATUSES = new Set(Object.values(STATUS));
 const FOLLOW_UP_STATUSES = new Set([STATUS.APPLIED, STATUS.APPLIED_AUTO]);
-
-const RESUME_FILENAME_BY_LABEL = {
-  frontend_engineer: "Daniel_Chimezie_CV_Frontend_Engineer.pdf",
-  react_native: "Daniel_Chimezie_CV_React_Native_Developer.pdf",
-  product_engineer: "Daniel_Chimezie_CV_Product_Engineer.pdf",
-};
 
 export async function POST(request) {
   try {
@@ -57,24 +45,14 @@ export async function POST(request) {
       );
 
       if (job && method === "email" && emailMatch) {
-        const sent = await sendApplication(
-          {
-            title: job["Role Title"] || "",
-            company: job.Company || "",
-            resumeFile:
-              RESUME_FILENAME_BY_LABEL[job["CV Version Used"]] ||
-              RESUME_FILENAME_BY_LABEL.frontend_engineer,
-          },
-          emailMatch[0],
-        );
-        if (sent) {
-          await updateStatus(rowNumber, STATUS.APPLIED_AUTO);
-          await setFollowUpDate(rowNumber, 7);
-          return NextResponse.json({ success: true, sent: true });
-        }
-        // Sending failed: keep it Approved so the next run retries.
-        await updateStatus(rowNumber, STATUS.APPROVED);
-        return NextResponse.json({ success: true, sent: false });
+        await updateStatus(rowNumber, STATUS.NEEDS_MANUAL);
+        return NextResponse.json({
+          success: true,
+          sent: false,
+          needsManual: true,
+          message:
+            "Email applications are paused until your job-specific CV is ready. This job was moved to Needs Manual Apply.",
+        });
       }
 
       // Web-form job: nothing to send, go straight to the manual queue.

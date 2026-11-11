@@ -1,0 +1,5 @@
+{
+  "_comment": "Only these tracks are currently included in new matches. Software engineering stays paused until Abdul's own engineering profile is configured.",
+  "activeTracks": ["brand_designer", "product_designer"],
+  "matchProfile": "abdul_design_v1"
+}

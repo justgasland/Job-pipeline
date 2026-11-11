@@ -26,6 +26,42 @@ test("the roles you are targeting pass the minimum score", () => {
   }
 });
 
+test("brand and product design roles use a separate design profile", () => {
+  const brand = job("Brand Design Intern", {
+    description:
+      "Create brand identity, visual identity, campaign concepts and typography.",
+  });
+  const product = job("Junior Product Designer", {
+    description:
+      "Work on product design, UI/UX, user research, wireframing and prototyping.",
+  });
+
+  assert.ok(computeMatchScore(brand) >= MINIMUM);
+  assert.ok(computeMatchScore(product) >= MINIMUM);
+  assert.equal(pickCvVersion(brand).cvKey, "custom_per_job");
+  assert.equal(pickCvVersion(brand).roleTrack, "brand_designer");
+  assert.equal(pickCvVersion(product).roleTrack, "product_designer");
+  assert.equal(pickCvVersion(brand).resumeFile, "");
+  assert.equal(pickCvVersion(brand).needsReview, true);
+});
+
+test("senior design roles and unrelated design titles score below threshold", () => {
+  assert.ok(
+    computeMatchScore(
+      job("Senior Brand Designer", {
+        description: "Brand identity, visual identity, typography, campaigns.",
+      }),
+    ) < MINIMUM,
+  );
+  assert.ok(
+    computeMatchScore(
+      job("Interior Designer", {
+        description: "Architecture, interiors, furniture and space planning.",
+      }),
+    ) < MINIMUM,
+  );
+});
+
 test("jobs that are not a fit fall below the minimum score", () => {
   for (const title of [
     "Support Engineer (EMEA)",

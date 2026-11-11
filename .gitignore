@@ -12,6 +12,7 @@ out/
 .env.*
 !.env.local.example
 credentials/
+/data/
 
 # logs and archives
 logs/

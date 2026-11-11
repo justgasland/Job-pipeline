@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@googleapis/sheets": "18.1.1",
+    "docx": "^9.15.3",
     "next": "14.2.15",
     "nodemailer": "6.9.15",
     "react": "18.3.1",
